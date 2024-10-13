@@ -7,10 +7,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Bot, Send, User, Save, Plus, Loader2, AlertCircle } from "lucide-react"
+import { Bot, Send, User, Save, Plus, Loader2, AlertCircle, LogOut, LayoutDashboard } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import axios from 'axios'
-
+import { useAppSelector } from '@/lib/store/hooks'
+import { deleteCookie } from 'cookies-next'
 interface Message {
   content: string;
   sender: 'user' | 'bot';
@@ -20,7 +21,7 @@ interface Message {
 export default function ChatBotInterface() {
   const router = useRouter()
   const { user_id, chat_id } = useParams()
-  
+  const user = useAppSelector((state) => state.user.user)
   const [messages, setMessages] = useState<Message[]>([])
   const [inputMessage, setInputMessage] = useState('')
   const [sidebarData, setSidebarData] = useState<any>([])
@@ -30,22 +31,20 @@ export default function ChatBotInterface() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (chat_id !== 'new_chat') {
-      setSidebarLoading(true)
-      setError(null)
-      axios.get(`/api/chat-history/${user_id}`)
-        .then(response => {
-          setSidebarData(response.data)
-        })
-        .catch(error => {
-          console.error('Error loading chat history:', error)
-          setError('Failed to load chat history. Please try again.')
-        })
-        .finally(() => {
-          setSidebarLoading(false)
-        })
-    }
-  }, [user_id, chat_id])
+    setSidebarLoading(true)
+    setError(null)
+    axios.get(`/api/chat-history/${user_id}`)
+      .then(response => {
+        setSidebarData(response.data)
+      })
+      .catch(error => {
+        console.error('Error loading chat history:', error)
+        setError('Failed to load chat history. Please try again.')
+      })
+      .finally(() => {
+        setSidebarLoading(false)
+      })
+  }, [])
 
   useEffect(() => {
     if (chat_id && chat_id !== 'new_chat') {
@@ -117,6 +116,20 @@ export default function ChatBotInterface() {
     router.push(`/${user_id}/${newChatID}`)
   }
 
+  const handleDashboard = () => {
+    router.push(`/${user_id}/dashboard`)
+  }
+
+  const handleLogout = () => {
+    console.log('Logout clicked')
+  
+    // Delete the user cookie
+    deleteCookie('user')
+  
+    // After logout, redirect to the login page
+    
+  }
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -128,7 +141,7 @@ export default function ChatBotInterface() {
             New Chat
           </Button>
         </div>
-        <ScrollArea className="h-[calc(100vh-60px)]">
+        <ScrollArea className="flex-grow">
           {sidebarLoading ? (
             <div className="flex items-center justify-center h-full">
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
@@ -148,6 +161,16 @@ export default function ChatBotInterface() {
             </div>
           )}
         </ScrollArea>
+        <div className="p-4 border-t border-gray-200">
+          <Button onClick={handleDashboard} className="w-full mb-2" variant="outline">
+            <LayoutDashboard className="w-4 h-4 mr-2" />
+            Dashboard
+          </Button>
+          <Button onClick={handleLogout} className="w-full" variant="outline">
+            <LogOut className="w-4 h-4 mr-2" />
+            Logout
+          </Button>
+        </div>
       </div>
 
       {/* Main Chat Area */}

@@ -51,7 +51,7 @@ export async function POST(request: NextRequest, { params }: { params: { userId:
     }
 
     let chatHistory;
-
+    console.log(chatId);
     if (chatId) {
       // If chatId exists, find the existing chat history
       chatHistory = await ChatHistory.findOne({ _id: new ObjectId(chatId), userId: new ObjectId(userId) });
