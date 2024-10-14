@@ -1,36 +1,126 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Chatbot with Dashboard
 
-## Getting Started
+This project is an AI-powered chatbot application with a user dashboard, built using Next.js, React, MongoDB and integrated with a Gemini AI backend.
 
-First, run the development server:
+## Table of Contents
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Video Demonstration](#video-demonstration)
+- [Functionality](#functionality)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- AI-powered chatbot using Gemini AI
+- User authentication and authorization
+- Real-time chat interface
+- Chat history saving and retrieval
+- Responsive design with mobile support
+- Admin dashboard for user management and analytics
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Prerequisites
 
-## Learn More
+Before you begin, ensure you have met the following requirements:
 
-To learn more about Next.js, take a look at the following resources:
+- Node.js (v14.0.0 or later)
+- npm (v6.0.0 or later)
+- A Gemini AI API key
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Installation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Clone the repository:
 
-## Deploy on Vercel
+   ```
+   git clone https://github.com/ankit-dot/tg_assignment.git
+   cd tg_assignment
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. Install the dependencies:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```
+   npm install
+   ```
+
+3. Create a `.env.local` file in the root directory and add your Gemini AI API key:
+
+   ```
+   GEMINI_API=your_api_key_here
+   ```
+
+4. Set up your MongoDB connection string in the `.env.local` file:
+   ```
+   MONGODB_URI=your_mongodb_connection_string
+   ```
+
+## Usage
+
+1. Start the development server:
+
+   ```
+   npm run dev
+   ```
+
+2. Open your browser and navigate to `http://localhost:3000`
+
+3. Register a new account or log in with existing credentials
+
+4. Start chatting with the AI or explore the dashboard features
+
+## Video Demonstration
+
+To see how to use this project, watch our video demonstration:
+
+[![AI Chatbot Demo](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](https://www.youtube.com/watch?v=VtDfkF7PF0A)
+
+[Click here to watch the video](https://www.youtube.com/watch?v=VtDfkF7PF0A)
+
+## Functionality
+
+1. **User Authentication**
+
+   - Register new accounts
+   - Log in with existing credentials
+   - Log out functionality
+
+2. **Chat Interface**
+
+   - Real-time chat with AI
+   - Message history display
+   - Typing indicators
+   - Error handling for AI responses
+
+3. **Chat Management**
+
+   - Create new chat sessions
+   - Save chat history
+   - Load previous chat sessions
+
+4. **Dashboard**
+
+   - View total users count
+   - View total chats count
+   - See active users in the last 24 hours
+   - Calculate average chats per user
+
+5. **User List**
+
+   - Display all registered users
+   - Show user details (email, role, chat count)
+   - Search functionality for users
+
+6. **Responsive Design**
+
+   - Mobile-friendly interface
+   - Collapsible sidebar for small screens
+
+7. **Admin Features**
+
+   - Access to user management (for admin roles)
+   - View detailed analytics
+
+8. **AI Integration**
+   - Powered by Gemini AI
+   - Handles various types of queries
+   - Markdown parsing for bot responses
