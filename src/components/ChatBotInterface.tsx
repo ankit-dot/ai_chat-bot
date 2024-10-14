@@ -42,6 +42,7 @@ export default function ChatBotInterface() {
   const [error, setError] = useState<string | null>(null);
   const [botOutput, setBotOutput] = useState<string>();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [responseError , setResponseError] = useState(false);
   useEffect(() => {
     setSidebarLoading(true);
     setError(null);
@@ -105,18 +106,19 @@ export default function ChatBotInterface() {
 
     //  If successful, updates the output state with the output field from the response data
     if (response.ok) {
-      const botResponse = data.output;
-      setBotOutput(botResponse);
+      console.log(botOutput);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { sender: "bot", content: data?.output, timestamp: new Date() },
+      ]);
+      setIsTyping(false);
     } else {
-      setBotOutput(data.error);
+      setResponseError(true);
     }
 
     console.log(botOutput);
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { sender: "bot", content: data?.output, timestamp: new Date() },
-    ]);
-    setIsTyping(false);
+
+   
     setInputMessage("");
   };
 
@@ -171,7 +173,31 @@ export default function ChatBotInterface() {
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
-
+  
+  const parseContent = (content: string) => {
+    // Split the content into lines
+    const lines = content.split('\n');
+  
+    // Parse each line
+    const parsedLines = lines.map(line => {
+      // Check for bold text
+      line = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+      // Check for italic text
+      line = line.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  
+      // Check for inline code
+      line = line.replace(/`(.*?)`/g, '<code>$1</code>');
+  
+      // Check for links
+      line = line.replace(/\[([^\]]+)\]$$([^)]+)$$/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  
+      return line;
+    });
+  
+    // Join the lines back together
+    return parsedLines.join('<br>');
+  };
   return (
     <div className="flex h-screen bg-gray-100 overflow-y-hidden">
       <Button
@@ -263,6 +289,8 @@ export default function ChatBotInterface() {
                       </AvatarFallback>
                     </Avatar>
                   )}
+
+
                   <div
                     className={`px-4 py-2 rounded-lg ${
                       message.sender === "user"
@@ -270,7 +298,7 @@ export default function ChatBotInterface() {
                         : "bg-gray-200 text-gray-800"
                     }`}
                   >
-                    {message.content}
+                    { responseError ? "some error occured! please Retry." :<div dangerouslySetInnerHTML={{ __html: parseContent(message.content) }} />}
                   </div>
                   {message.sender === "user" && (
                     <Avatar className="ml-2">
