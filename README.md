@@ -88,8 +88,7 @@ To see how to use this project, watch our video demonstration:
 
    - Real-time chat with AI
    - Message history display
-   - Typing indicators
-   - Error handling for AI responses
+   
 
 3. **Chat Management**
 
@@ -123,4 +122,4 @@ To see how to use this project, watch our video demonstration:
 8. **AI Integration**
    - Powered by Gemini AI
    - Handles various types of queries
-   - Markdown parsing for bot responses
+   
