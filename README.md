@@ -72,7 +72,7 @@ Before you begin, ensure you have met the following requirements:
 
 To see how to use this project, watch our video demonstration:
 
-[![AI Chatbot Demo](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](https://www.youtube.com/watch?v=VtDfkF7PF0A)
+[![AI Chatbot Demo](./thumbnailPhoto.png)](https://www.youtube.com/watch?v=VtDfkF7PF0A)
 
 [Click here to watch the video](https://www.youtube.com/watch?v=VtDfkF7PF0A)
 
