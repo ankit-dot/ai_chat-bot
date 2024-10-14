@@ -21,24 +21,36 @@ import {
   Search,
   Loader2,
   ShieldAlert,
+  Router,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useParams } from "next/navigation";
 import { useAppSelector } from "@/lib/store/hooks";
 
 const UnauthorizedAccess = () => {
+  const router = useRouter();
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <ShieldAlert className="w-16 h-16 mx-auto text-yellow-500 mb-4" />
-          <CardTitle className="text-2xl font-bold text-gray-800">Unauthorized Access</CardTitle>
+          <CardTitle className="text-2xl font-bold text-gray-800">
+            Unauthorized Access
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-center text-gray-600 mb-4">
-            Sorry, you don't have permission to view the dashboard. Please contact an administrator if you believe this is an error.
+            Sorry, you don't have permission to view the dashboard. You need to
+            be a admin to view this page..
           </p>
-          <Button className="w-full" variant="outline">
+          <Button
+            className="w-full"
+            variant="outline"
+            onClick={() => {
+              router.push("/");
+            }}
+          >
             Return to Home
           </Button>
         </CardContent>
@@ -56,8 +68,8 @@ export default function Dashboard() {
   const filteredUsers = userData.filter((user: any) =>
     user?.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
-  const user = useAppSelector((state) => state.user.user);
+
+  const user: any = useAppSelector((state) => state.user.user);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -94,7 +106,7 @@ export default function Dashboard() {
     return chats.length;
   };
 
-  if (user?.role !== 'admin') {
+  if (user?.role !== "admin") {
     return <UnauthorizedAccess />;
   }
 

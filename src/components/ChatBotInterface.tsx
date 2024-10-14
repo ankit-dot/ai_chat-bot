@@ -1,139 +1,193 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
-import { useRouter } from 'next/navigation'
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Bot, Send, User, Save, Plus, Loader2, AlertCircle, LogOut, LayoutDashboard } from "lucide-react"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import axios from 'axios'
-import { useAppSelector } from '@/lib/store/hooks'
-import { deleteCookie } from 'cookies-next'
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Bot,
+  Send,
+  User,
+  Save,
+  Plus,
+  Loader2,
+  AlertCircle,
+  LogOut,
+  LayoutDashboard,
+  Menu,
+} from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import axios from "axios";
+import { useAppSelector } from "@/lib/store/hooks";
+import { deleteCookie, setCookie } from "cookies-next";
 interface Message {
   content: string;
-  sender: 'user' | 'bot';
+  sender: "user" | "bot";
   timestamp: Date;
 }
 
 export default function ChatBotInterface() {
-  const router = useRouter()
-  const { user_id, chat_id } = useParams()
-  const user = useAppSelector((state) => state.user.user)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [inputMessage, setInputMessage] = useState('')
-  const [sidebarData, setSidebarData] = useState<any>([])
-  const [isTyping, setIsTyping] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [sidebarLoading, setSidebarLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
+  const router = useRouter();
+  const { user_id, chat_id } = useParams();
+  const user = useAppSelector((state) => state.user.user);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputMessage, setInputMessage] = useState("");
+  const [sidebarData, setSidebarData] = useState<any>([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [sidebarLoading, setSidebarLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [botOutput, setBotOutput] = useState<string>();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   useEffect(() => {
-    setSidebarLoading(true)
-    setError(null)
-    axios.get(`/api/chat-history/${user_id}`)
-      .then(response => {
-        setSidebarData(response.data)
+    setSidebarLoading(true);
+    setError(null);
+    axios
+      .get(`/api/chat-history/${user_id}`)
+      .then((response) => {
+        setSidebarData(response.data);
       })
-      .catch(error => {
-        console.error('Error loading chat history:', error)
-        setError('Failed to load chat history. Please try again.')
+      .catch((error) => {
+        console.error("Error loading chat history:", error);
+        setError("Failed to load chat history. Please try again.");
       })
       .finally(() => {
-        setSidebarLoading(false)
-      })
-  }, [])
+        setSidebarLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
-    if (chat_id && chat_id !== 'new_chat') {
-      setLoading(true)
-      setError(null)
-      axios.get(`/api/chat/${chat_id}`)
-        .then(response => {
+    if (chat_id && chat_id !== "new_chat") {
+      setLoading(true);
+      setError(null);
+      axios
+        .get(`/api/chat/${chat_id}`)
+        .then((response) => {
           const chatMessages = response.data.messages.map((msg: any) => ({
             content: msg.content,
             sender: msg.sender,
             timestamp: msg.timestamp,
-          }))
-          setMessages(chatMessages)
+          }));
+          setMessages(chatMessages);
         })
-        .catch(error => {
-          console.error('Error loading chat history:', error)
-          setError('Failed to load chat messages. Please try again.')
+        .catch((error) => {
+          console.error("Error loading chat history:", error);
+          setError("Failed to load chat messages. Please try again.");
         })
         .finally(() => {
-          setLoading(false)
-        })
+          setLoading(false);
+        });
     }
-  }, [chat_id])
+  }, [chat_id]);
 
-  const handleSendMessage = () => {
-    if (inputMessage.trim() === '') return
+  const handleSendMessage = async () => {
+    if (inputMessage.trim() === "") return;
 
-    setMessages([...messages, { content: inputMessage, sender: 'user', timestamp: new Date() }])
-    setInputMessage('')
+    setMessages([
+      ...messages,
+      { content: inputMessage, sender: "user", timestamp: new Date() },
+    ]);
 
-    setIsTyping(true)
-    setTimeout(() => {
-      setIsTyping(false)
-      setMessages(prevMessages => [
-        ...prevMessages,
-        { sender: 'bot', content: 'This is a simulated response from the chatbot.', timestamp: new Date() }
-      ])
-    }, 1500)
-  }
+    setIsTyping(true);
+    const response = await fetch("/api/gemini", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ body: inputMessage }),
+    });
+
+    // Waits for the response to be converted to JSON format and stores it in the data variable
+    const data = await response.json();
+
+    //  If successful, updates the output state with the output field from the response data
+    if (response.ok) {
+      const botResponse = data.output;
+      setBotOutput(botResponse);
+    } else {
+      setBotOutput(data.error);
+    }
+
+    console.log(botOutput);
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { sender: "bot", content: data?.output, timestamp: new Date() },
+    ]);
+    setIsTyping(false);
+    setInputMessage("");
+  };
 
   const handleSaveChat = async () => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
     try {
       const response = await axios.post(`/api/chat-history/${user_id}`, {
         messages,
-        chatId: chat_id === 'new_chat' ? null : chat_id
-      })
-      
-      const savedChatId = response.data.chatId
-      if (chat_id === 'new_chat') {
-        router.push(`/${user_id}/${savedChatId}`)
+        chatId: chat_id === "new_chat" ? null : chat_id,
+      });
+
+      const savedChatId = response.data.chatId;
+
+      if (chat_id === "new_chat") {
+        setCookie("chat", JSON.stringify(savedChatId));
+        router.push(`/${user_id}/${savedChatId}`);
       }
-      alert('Chat saved successfully!')
+      alert("Chat saved successfully!");
     } catch (error) {
-      console.error('Error saving chat:', error)
-      setError('Failed to save chat. Please try again.')
+      console.error("Error saving chat:", error);
+      setError("Failed to save chat. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleNewChat = () => {
-    router.push(`/${user_id}/new_chat`)
-    setMessages([])
-  }
+    router.push(`/${user_id}/new_chat`);
+    setMessages([]);
+  };
 
   const handleSidebarChat = (newChatID: string) => {
-    router.push(`/${user_id}/${newChatID}`)
-  }
+    setCookie("chat", JSON.stringify(newChatID));
+    router.push(`/${user_id}/${newChatID}`);
+  };
 
   const handleDashboard = () => {
-    router.push(`/${user_id}/dashboard`)
-  }
+    router.push(`/${user_id}/dashboard`);
+  };
 
   const handleLogout = () => {
-    console.log('Logout clicked')
-  
+    console.log("Logout clicked");
+
     // Delete the user cookie
-    deleteCookie('user')
-  
+    deleteCookie("user");
+    deleteCookie("chat");
+    router.push("/login");
     // After logout, redirect to the login page
-    
-  }
+  };
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 overflow-y-hidden">
+      <Button
+        className="sm:hidden fixed top-4 left-4 z-50"
+        variant="outline"
+        size="icon"
+        onClick={toggleSidebar}
+      >
+        <Menu className="h-4 w-4" />
+      </Button>
       {/* Sidebar */}
-      <div className="w-64 bg-white border-r sm:flex flex-col hidden border-gray-200">
+      <div
+        className={`w-64 bg-white border-r border-gray-200 fixed inset-y-0 left-0 transform ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } transition-transform duration-300 ease-in-out sm:relative sm:translate-x-0 z-40`}
+      >
         <div className="p-4 flex justify-between items-center">
           <h2 className="text-lg font-semibold">Chat History</h2>
           <Button onClick={handleNewChat} size="sm" variant="outline">
@@ -141,18 +195,20 @@ export default function ChatBotInterface() {
             New Chat
           </Button>
         </div>
-        <ScrollArea className="flex-grow">
+        <ScrollArea className="flex-grow h-[75%]">
           {sidebarLoading ? (
             <div className="flex items-center justify-center h-full">
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
             </div>
           ) : (
             <div className="p-2">
-              {sidebarData.map((chatData:any, i:number) => (
+              {sidebarData.map((chatData: any, i: number) => (
                 <Button
                   key={chatData._id}
                   variant="ghost"
-                  className={`${chatData?._id === chat_id ? "bg-gray-300" :""} w-full justify-start text-left mb-1`}
+                  className={`${
+                    chatData?._id === chat_id ? "bg-gray-300" : ""
+                  } w-full justify-start text-left mb-1`}
                   onClick={() => handleSidebarChat(chatData._id)}
                 >
                   Chat {i + 1}
@@ -162,7 +218,11 @@ export default function ChatBotInterface() {
           )}
         </ScrollArea>
         <div className="p-4 border-t border-gray-200">
-          <Button onClick={handleDashboard} className="w-full mb-2" variant="outline">
+          <Button
+            onClick={handleDashboard}
+            className="w-full mb-2"
+            variant="outline"
+          >
             <LayoutDashboard className="w-4 h-4 mr-2" />
             Dashboard
           </Button>
@@ -193,10 +253,10 @@ export default function ChatBotInterface() {
                 <div
                   key={index}
                   className={`flex items-start mb-4 ${
-                    message.sender === 'user' ? 'justify-end' : 'justify-start'
+                    message.sender === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
-                  {message.sender === 'bot' && (
+                  {message.sender === "bot" && (
                     <Avatar className="mr-2">
                       <AvatarFallback>
                         <Bot className="w-5 h-5" />
@@ -205,14 +265,14 @@ export default function ChatBotInterface() {
                   )}
                   <div
                     className={`px-4 py-2 rounded-lg ${
-                      message.sender === 'user'
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200 text-gray-800'
+                      message.sender === "user"
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-800"
                     }`}
                   >
                     {message.content}
                   </div>
-                  {message.sender === 'user' && (
+                  {message.sender === "user" && (
                     <Avatar className="ml-2">
                       <AvatarFallback>
                         <User className="w-5 h-5" />
@@ -243,13 +303,17 @@ export default function ChatBotInterface() {
               placeholder="Type your message..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
               className="flex-1 mr-2"
             />
             <Button onClick={handleSendMessage} className="mr-2">
               <Send className="w-4 h-4" />
             </Button>
-            <Button onClick={handleSaveChat} variant="outline" disabled={loading}>
+            <Button
+              onClick={handleSaveChat}
+              variant="outline"
+              disabled={loading}
+            >
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
               ) : (
@@ -261,5 +325,5 @@ export default function ChatBotInterface() {
         </div>
       </div>
     </div>
-  )
+  );
 }

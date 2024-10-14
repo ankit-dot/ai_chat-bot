@@ -13,24 +13,24 @@ export async function GET() {
     // Ensure Mongoose is connected
     await mongooseConnection;
 
-    
-    
     // Check if the userId is a valid ObjectId
- 
 
     // Fetch the chat history using Mongoose
     const chat = await ChatHistory.find({});
     const users = await User.find({});
 
     if (!chat) {
-      return NextResponse.json({ message: 'Chat history not found' }, { status: 404 });
+      return NextResponse.json(
+        { message: "Chat history not found" },
+        { status: 404 }
+      );
     }
 
-    return NextResponse.json({chat, users} , { status: 200 });
+    return NextResponse.json({ chat, users }, { status: 200 });
   } catch (error: any) {
-    return NextResponse.json({ error: 'Error fetching chat history', details: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error fetching chat history", details: error.message },
+      { status: 500 }
+    );
   }
 }
-
-
-

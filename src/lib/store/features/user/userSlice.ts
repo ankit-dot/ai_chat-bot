@@ -1,19 +1,19 @@
 // redux/slices/userSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  user: null,  // Stores the logged-in user
+  user: null, // Stores the logged-in user
 };
 
 const userSlice = createSlice({
-  name: 'user',
+  name: "user",
   initialState,
   reducers: {
     setUser: (state, action) => {
-      state.user = action.payload;  // Set the logged-in user
+      state.user = action.payload; // Set the logged-in user
     },
     clearUser: (state) => {
-      state.user = null;  // Clear the user when logged out
+      state.user = null; // Clear the user when logged out
     },
   },
 });
