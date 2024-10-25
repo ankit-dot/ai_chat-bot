@@ -4,7 +4,7 @@ This project is an AI-powered chatbot application with a user dashboard, built u
 
 
 # Live Website
-[Live Website](https://www.youtube.com/watch?v=VtDfkF7PF0A](https://ai-chat-bot007.vercel.app/)
+[Live Website](https://ai-chat-bot007.vercel.app/)
 ## Table of Contents
 
 - [Features](#features)
