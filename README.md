@@ -2,6 +2,9 @@
 
 This project is an AI-powered chatbot application with a user dashboard, built using Next.js, React, MongoDB and integrated with a Gemini AI backend.
 
+
+# Live Website
+[Click here to watch the video]([https://www.youtube.com/watch?v=VtDfkF7PF0A](https://ai-chat-bot007.vercel.app/))
 ## Table of Contents
 
 - [Features](#features)
@@ -33,8 +36,8 @@ Before you begin, ensure you have met the following requirements:
 1. Clone the repository:
 
    ```
-   git clone https://github.com/ankit-dot/tg_assignment.git
-   cd tg_assignment
+   git clone https://github.com/ankit-dot/ai_chat-bot.git
+   cd ai_chat-bot
    ```
 
 2. Install the dependencies:
